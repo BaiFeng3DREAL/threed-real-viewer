@@ -1,8 +1,8 @@
 # ThreeView开发文档
 
 ### 名词定义
-- 普通模型（General Model）：区别于场景，一个普通模型场景只有一个模型。
-- 场景（Scene）：场景由一个或多个品类组成，如衬衫、裤子等组成一个场景。
+- 普通模型（General Model）：与模型中心“我的模型”中的模型一一对应。
+- 场景（Scene）：与模型中心“我的搭配”中的场景一一对应。场景由一个或多个产品构成，如衬衫、裤子等构成一个场景。
 - 产品（Product）: 产品由一个或多个组合组成，如圆摆衬衫可由口袋、大身两个组合组成。
 - 组合（Combination）：组合由一个或多个部件组成，如圆摆衬衫大身（组合）由袖口裥、门襟、后片、领型、袖口等组成。
 备注：每个组合可关联多种材料。
@@ -44,188 +44,79 @@ Return:
 
 
 
-### 私有搭配列表
+## 3D Real 开发者工具
 
-URL：`/api/scene/list`
-Method：`GET`
-
-header: {
-
-  AccessToken : `${之前传入的token}`
-
-}
-
-Return: 
-
-```json
-{
-    // 返回状态码， 0为成功，其他为失败。
-    code: number,
-    // 返回数据，数组，包含了分类信息
-    data: [{
-        id: number,
-        name: string,
-        cover: string,
-        remark: string
-    }]
-}
-```
-
-### 私有模型列表
-
-URL：`/api/generalModel/list`
-Method：`GET`
-
-header: {
-
-  AccessToken : `${之前传入的token}`
-
-}
-
-Return: 
-
-```json
-{
-    // 返回状态码， 0为成功，其他为失败。
-    code: number,
-    // 返回数据，数组，包含了分类信息
-    data: [{
-        id: number,
-        name: string,
-				cover: string
-    }]
-}
-```
-
-
-### 指定id的搭配
-
-URL：`/api/scene/{id}`
-Method：`GET`
-
-header: {
-
-AccessToken : `${拿到的token}`
-
-}
-
-Return: 
-
-```json
-{
-  // 返回状态码， 0为成功，其他为失败。
-  code: Number,
-  // 返回数据，数组，包含了分类信息
-  data: {
-    "id": number,
-    "name": string,
-    "remark": string,
-    "cover": string,
-    "argument": string,
-    "products": [{
-      "id": number,
-      "name": string,
-      "cover": string,
-      "combinations": [{
-        "id": 9,
-        "name": "123平下摆",
-        "cover": "",
-        "parts": [{
-          "id": 22,
-          "name": "",
-          "cover": "",
-          "elements": [{
-            "id": 16,
-            "name": "",
-            "cover": "",
-            "model": "",
-            "fixedModels": [{
-              "id": 13,
-              "name": "",
-              "cover": "",
-              "model": "",
-              "material": "",
-              "createdAt": "",
-              "updatedAt": "",
-            }],
-          }],
-
-          "fabrics": [{
-            "id": 9,
-            "name": "",
-            "cover": "",
-            "assets": string,
-            "config": string
-          }]
-        }]
-      }]
-    }],
-    "fixedModels": [{
-      "id": 3,
-      "name": String,
-      "cover": String,
-      "model": String,
-      "material": Number
-    }]
-  }
-}
-```
-
-
-
-### 指定id的模型
-
-URL：`/api/scene/:sceneId`
-Method：`GET`
-
-header: {
-
-AccessToken : `${拿到的token}`
-
-}
-
-Return: 
-
-```
-{
-  // 返回状态码， 0为成功，其他为失败。
-  code: Number,
-  // 返回数据，数组，包含了分类信息
-  data: {
-    "id": number,
-    "name": string,
-    "remark": string,
-    "cover": string,
-    "argument": string,
-    ”model“: string,
-    "material": string
-  }
-}
-```
-
-
-
-## 3D场景插件
-
-该3D插件主要使用来渲染一个私有的3D场景，使用方式如下。
+3D Real 开发者工具，可以帮助您开发自己的三维产品展示页面，提供了高度自定义的接口。使用方式如下： 
 
 ### 引入方式
-<script src="js/threed-real-viewer.js"></script>
+<script src="js/threed-real-sdk-1.0.0.js"></script>
 ### 初始化
 
 ```
-var viewer = new ThreedRealViewer(div: HTMLDivElement, type: type: 'GENERAL' | 'COLLOCATION', data: object, finishLoading: () => void);
+var api = new ThreeDRealAPI(token: string);
 
 参数解析:
-    div: div HTML元素.
-    type: 类型，请传 'GENERAL' 或者 'COLLOCATION'.
-    data: 从后台拿到的对应的3D场景数据.
-    finishLoading: 完成加载回调.
+    token: 使用 AccessKey 和 AccessSecret 获取的token。
 ```
 
+### 获取私有场景
+
+获取私有搭配列表
+```
+api.fetchScenes()
+
+参数解析:
+  返回值: Promise<{
+    id: number,
+    name: string,
+    cover: string
+  }[]>
+```
+
+获取私有模型列表
+```
+api.fetchScenes()
+
+参数解析:
+  返回值: Promise<{
+    id: number,
+    name: string,
+    cover: string
+  }[]>
+
+```
+
+### 获取 远端数据 以及 三维场景交互控制器
+
+获取搭配数据，以及三维场景交互控制器。
+
+```
+api.getCollocationView();
+
+参数解析:
+  返回值: Promise<{
+    data: object（如何使用，请看 demo 中的例子）,
+    threedViewer: ThreeDRealViewer
+  }[]>
+```
+
+获取模型数据，以及三维场景交互控制器。
+
+```
+api.getModelView(div: HTMLDivElement, id: number, finish?: () => void);
+参数解析:
+  返回值: Promise<{
+    data: object（如何使用，请看 demo 中的例子）,
+    threedViewer: ThreeDRealViewer
+  }[]>
+```
+
+
+通过上面的接口获取三维视图控制器，对于搭配来说，我们可以通过调用以下接口触发模型的变换：
 ### 切换产品
 
 ```
+
 viewer.selectProduct(productIndex: number);
 
 参数解析:
@@ -274,4 +165,9 @@ viewer.selectFabric (productIndex: number, combIndex: number, targetFIndex: numb
 	combIndex: 当前组合的下标.
 	targetFIndex: 需要切换到的面料的下标
   返回值: Promise
+```
+
+### 销毁 三维视图控制器
+```
+  viewer.destroy()
 ```
